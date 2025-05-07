@@ -1,6 +1,7 @@
 ## installation
 
-This mcp server requires the [Go SDK](https://go.dev).
+This mcp server requires the [Go SDK](https://go.dev) for installation.
+To produce music, you need to setup a MIDI receiver such as a DAW or a hardware synthesizer.
 
     go install github.com/emicklei/melrose-mcp@latest
 
