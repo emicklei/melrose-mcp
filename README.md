@@ -42,6 +42,7 @@ I'll create a small segment inspired by Claude Debussy's impressionist style usi
 ## configuration in your client
 
 Below an example to configure it in Claude Desktop.
+
     {
         "mcpServers": {
             "melrōse": {
