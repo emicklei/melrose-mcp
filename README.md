@@ -1,3 +1,9 @@
+## melrose-mcp 
+
+[melrōse](https://melrōse.org) is a tool to create and play music by programming melodies. It uses a custom language to compose notes and create loops and tracks to play.
+
+`melrose-mcp` is an [MCP](http://modelcontextprotocol.io/) server (STDIO) that uses the packages from the `melrōse` tool.
+
 ## installation
 
 This mcp server requires the [Go SDK](https://go.dev) for installation.
