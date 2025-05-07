@@ -59,7 +59,7 @@ Below an example to configure it in Claude Desktop.
 - play the notes of Frere Jacques
 - play the C# chord
 
-You help your LLM understand the Melrōse language, you can use this [context](resources/melrose_llm_context.txt).
+To help your LLM understand the Melrōse language better, you can use this [context](resources/melrose_llm_context.txt).
 
 ### Contributions
 
