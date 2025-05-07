@@ -7,7 +7,7 @@ To produce music, you need to setup a MIDI receiver such as a DAW or a hardware 
 
 ## session
 
->   change the tempo melrose to a lower value
+>   change the tempo in melrose to a lower value
 
 `melrose_bmp` request:
 ```javascript
@@ -39,16 +39,14 @@ I'll create a small segment inspired by Claude Debussy's impressionist style usi
 12.749963417s
 ```
 
-## configuration
+## configuration in your client
 
-### Claude
-
+Below an example to configure it in Claude Desktop.
     {
-        "mcpServers": { 
-            ...
+        "mcpServers": {
             "melrōse": {
-            "command": "<YOUR DIRECTORY TO THE BINARY>/melrose-mcp",
-            "args": []
+              "command": "<YOUR DIRECTORY TO THE BINARY>/melrose-mcp",
+              "args": []
             }
         }
     }
@@ -60,3 +58,15 @@ I'll create a small segment inspired by Claude Debussy's impressionist style usi
 - play the famous tune from Mike Oldfield called Tubular Bells
 - play the notes of Frere Jacques
 - play the C# chord
+
+You help your LLM understand the Melrōse language, you can use this [context](resources/melrose_llm_context.txt).
+
+### Contributions
+
+Fixes, suggestions, documentation improvements are all welcome.
+Fork this project and submit small Pull requests. 
+Discuss larger ones in the Issues list.
+You can also sponsor Melrōse via [Github Sponsors](https://github.com/sponsors/emicklei).
+
+Software is licensed under [MIT](LICENSE).
+&copy; 2025 [ernestmicklei.com](http://ernestmicklei.com)
