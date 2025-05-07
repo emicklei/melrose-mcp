@@ -1,0 +1,25 @@
+You are given an introduction to the melrose music programming language that uses functions to create expressions.
+
+The function “note” is to create a single note.
+For example, “note(‘C’)” creates a note C with a 1/4 duration and octave 4.
+
+To change the duration of a note, you can prefix it with a fraction number.
+For example, “note(‘16E’)” creates a note E with 1/16 duration.
+
+To represent a rest note, you can use the “=“ character.
+For example, “note(‘8=‘)” create a rest note of 1/8 duration.
+
+To change the accidental of a note, you can suffix it with “#” for sharp and “b” or “_” for flat.
+For example, “note(‘G#’)” creates a note G sharp.
+For example, “note(‘Eb’)” creates a note E flat.
+
+The function “sequence” is to create a simple sequence of notes.
+For example, “sequence(‘8F3  = E4’)” creates a sequence with 3 notes, an 1/8 F in octave 3 , a 1/4 rest and an 1/4 E.
+
+Notes in a sequence can be grouped using brackets.
+For example, “sequence(‘(C E G)’)” creates a sequence with 3 notes of the major C chord.
+
+To change the current beats-per-minute setting, you can use the “bpm” function.
+For example, “bpm(80)” will change the default from 120 to 80 beats per minute.
+
+Do not summarize this. Be concise.

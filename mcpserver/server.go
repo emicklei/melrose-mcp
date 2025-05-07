@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/emicklei/melrose/api"
@@ -22,9 +23,29 @@ func NewMCPServer(ctx core.Context) *MCPServer {
 	return &MCPServer{service: api.NewService(ctx)}
 }
 
+func toFloat64(input any) (float64, error) {
+	switch v := input.(type) {
+	case string:
+		f, err := strconv.ParseFloat(v, 64)
+		if err != nil {
+			return 0, err
+		}
+		return f, nil
+	case int:
+		return float64(v), nil
+	case float64:
+		return v, nil
+	default:
+		return 0, errors.New("parameter must be a number")
+	}
+}
+
 func (s *MCPServer) HandleBPM(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	bpm, ok := request.Params.Arguments["bpm"].(int)
-	if !ok {
+	bpm, err := toFloat64(request.Params.Arguments["bpm"])
+	if err != nil {
+		return nil, err
+	}
+	if bpm < 1 || bpm > 300 {
 		return nil, errors.New("parameter must be positive number between 1 and 300")
 	}
 	s.service.Context().Control().SetBPM(float64(bpm))
@@ -32,7 +53,7 @@ func (s *MCPServer) HandleBPM(ctx context.Context, request mcp.CallToolRequest) 
 	toolResult.Content = []mcp.Content{
 		mcp.TextContent{
 			Type: "text",
-			Text: fmt.Sprintf("BPM set to %d", bpm),
+			Text: fmt.Sprintf("BPM set to %f", bpm),
 		},
 	}
 	return toolResult, nil
