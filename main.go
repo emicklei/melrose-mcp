@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/emicklei/melrose-mcp/mcpserver"
 	"github.com/emicklei/melrose/notify"
-	"github.com/emicklei/melrose/server/mcpserver"
 	"github.com/emicklei/melrose/system"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
@@ -47,7 +47,7 @@ func main() {
 	})
 
 	// Add play tool
-	tool := mcp.NewTool("melrose_play",
+	tool1 := mcp.NewTool("melrose_play",
 		mcp.WithDescription(`Melrōse is a language to create music by programming expressions.
 		 The language uses musical primitives (note, sequence, chord) and many functions (map, group, transpose)
 		 that can be used to create more complex patterns and loops of notes.`),
@@ -56,7 +56,17 @@ func main() {
 			mcp.Description("functional expression using the syntax rules of https://xn--melrse-egb.org/docs/reference/notations"),
 		),
 	)
-	ioServer.AddTool(tool, playServer.HandlePlay)
+	ioServer.AddTool(tool1, playServer.HandlePlay)
+
+	// Add bpm tool
+	tool2 := mcp.NewTool("melrose_bpm",
+		mcp.WithDescription(`Changes the beats per minutes setting. Default is 120.`),
+		mcp.WithString("bpm",
+			mcp.Required(),
+			mcp.Description("number representing beats per minute, must be between 1 and 300"),
+		),
+	)
+	ioServer.AddTool(tool2, playServer.HandleBPM)
 
 	// Add chord prompt
 	chordHander := func(ctx context.Context, request mcp.GetPromptRequest) (*mcp.GetPromptResult, error) {
