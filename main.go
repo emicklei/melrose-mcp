@@ -68,11 +68,21 @@ func main() {
 	)
 	ioServer.AddTool(tool2, playServer.HandleBPM)
 
-	// Add device lister
+	// Add device listing
 	tool3 := mcp.NewTool("melrose_devices",
 		mcp.WithDescription(`List all available input and output MIDI devices.`),
 	)
 	ioServer.AddTool(tool3, playServer.HandleListDevices)
+
+	// Add device selector
+	tool4 := mcp.NewTool("melrose_change_output_device",
+		mcp.WithDescription(`Change the output device to the one specified by the device name.`),
+		mcp.WithNumber("id",
+			mcp.Required(),
+			mcp.Description("id me of the output device")),
+		mcp.WithNumber("channel",
+			mcp.Description("default channel number for this device. Must be between 1 and 16")))
+	ioServer.AddTool(tool4, playServer.HandleChangeOutputDevice)
 
 	// Add chord prompt
 	chordHander := func(ctx context.Context, request mcp.GetPromptRequest) (*mcp.GetPromptResult, error) {

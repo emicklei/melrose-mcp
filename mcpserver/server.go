@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/emicklei/melrose/api"
@@ -23,21 +22,29 @@ func NewMCPServer(ctx core.Context) *MCPServer {
 	return &MCPServer{service: api.NewService(ctx)}
 }
 
-func toFloat64(input any) (float64, error) {
-	switch v := input.(type) {
-	case string:
-		f, err := strconv.ParseFloat(v, 64)
-		if err != nil {
-			return 0, err
-		}
-		return f, nil
-	case int:
-		return float64(v), nil
-	case float64:
-		return v, nil
-	default:
-		return 0, errors.New("parameter must be a number")
+func (s *MCPServer) HandleChangeOutputDevice(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	id, err := toInt(request.Params.Arguments["id"])
+	if err != nil {
+		return nil, err
 	}
+	channel := 1
+	channelInput := request.Params.Arguments["channel"]
+	if channelInput != nil {
+		ci, err := toInt(channelInput)
+		if err != nil {
+			return nil, fmt.Errorf("channel must be a number between 1 and 16")
+		}
+		channel = ci
+	}
+	s.service.ChangeDefaultDeviceAndChannel(false, id, channel)
+	toolResult := new(mcp.CallToolResult)
+	toolResult.Content = []mcp.Content{
+		mcp.TextContent{
+			Type: "text",
+			Text: fmt.Sprintf("Output device is set to %d", id),
+		},
+	}
+	return toolResult, nil
 }
 
 func (s *MCPServer) HandleBPM(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
