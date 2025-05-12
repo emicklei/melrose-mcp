@@ -68,6 +68,12 @@ func main() {
 	)
 	ioServer.AddTool(tool2, playServer.HandleBPM)
 
+	// Add device lister
+	tool3 := mcp.NewTool("melrose_devices",
+		mcp.WithDescription(`List all available input and output MIDI devices.`),
+	)
+	ioServer.AddTool(tool3, playServer.HandleListDevices)
+
 	// Add chord prompt
 	chordHander := func(ctx context.Context, request mcp.GetPromptRequest) (*mcp.GetPromptResult, error) {
 		note := request.Params.Arguments["ground"]

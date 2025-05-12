@@ -2,8 +2,8 @@ github.com/Try431/EasyMIDI v1.0.3 h1:SQ+HGlh7Ocn6kW93zv/oSJSQMsf4WKh2SK/mhcC8Guc
 github.com/Try431/EasyMIDI v1.0.3/go.mod h1:G2Hh7MmGyph2YRKHBcfMeH78kmRGo1nwo0Gy9TkzdAc=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/emicklei/melrose v0.56.0 h1:50HUo5f/T7zklHAoD1t5XO6goKsRTeaomdVyWwS0cRo=
-github.com/emicklei/melrose v0.56.0/go.mod h1:6O55XQemafW2iPIHRnbALe3kBam042MYxV2EHCHKKTg=
+github.com/emicklei/melrose v0.58.0 h1:TxS2VHW+9NAXaJsl/1MqfHa0dxSWU5PuKqb8YQjKJ5c=
+github.com/emicklei/melrose v0.58.0/go.mod h1:IeDR4WnDrJH//VzwHcCc9/7Vj72uOWey3Tpn4PwKa+U=
 github.com/emicklei/tre v1.7.0 h1:bEZhzT3o+9lcJ4KQh+uf0mv7rmMe0LEtVDa/7F5iq/c=
 github.com/emicklei/tre v1.7.0/go.mod h1:3e+DTVKARET1BwLFwOIJwgYLUtkN+X9XZT0JDnb+OYY=
 github.com/expr-lang/expr v1.16.9 h1:WUAzmR0JNI9JCiF0/ewwHB1gmcGw5wW7nWt8gc6PpCI=

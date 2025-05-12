@@ -3,7 +3,7 @@ module github.com/emicklei/melrose-mcp
 go 1.24.0
 
 require (
-	github.com/emicklei/melrose v0.56.0
+	github.com/emicklei/melrose v0.58.0
 	github.com/mark3labs/mcp-go v0.26.0
 )
 

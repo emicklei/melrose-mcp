@@ -5,7 +5,7 @@ import (
 	"log"
 	"testing"
 
-	"github.com/emicklei/melrose/server/mcpserver"
+	"github.com/emicklei/melrose-mcp/mcpserver"
 	"github.com/emicklei/melrose/system"
 	"github.com/mark3labs/mcp-go/mcp"
 )

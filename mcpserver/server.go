@@ -112,3 +112,19 @@ func (s *MCPServer) HandlePlay(ctx context.Context, request mcp.CallToolRequest)
 	toolResult.Content = content
 	return toolResult, nil
 }
+
+func (s *MCPServer) HandleListDevices(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	list := s.service.ListDevices()
+	toolResult := new(mcp.CallToolResult)
+	for _, d := range list {
+		kind := "input"
+		if !d.IsInput {
+			kind = "output"
+		}
+		toolResult.Content = append(toolResult.Content, mcp.TextContent{
+			Type: "text",
+			Text: fmt.Sprintf("%s is available as %s with device id %d", d.Name, kind, d.ID),
+		})
+	}
+	return toolResult, nil
+}
