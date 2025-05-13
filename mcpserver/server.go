@@ -36,13 +36,23 @@ func (s *MCPServer) HandleChangeOutputDevice(ctx context.Context, request mcp.Ca
 		}
 		channel = ci
 	}
-	s.service.ChangeDefaultDeviceAndChannel(false, id, channel)
+	err = s.service.ChangeDefaultDeviceAndChannel(false, id, channel)
 	toolResult := new(mcp.CallToolResult)
-	toolResult.Content = []mcp.Content{
-		mcp.TextContent{
-			Type: "text",
-			Text: fmt.Sprintf("Output device is set to %d", id),
-		},
+	if err != nil {
+		toolResult.IsError = true
+		toolResult.Content = []mcp.Content{
+			mcp.TextContent{
+				Type: "text",
+				Text: err.Error(),
+			},
+		}
+	} else {
+		toolResult.Content = []mcp.Content{
+			mcp.TextContent{
+				Type: "text",
+				Text: fmt.Sprintf("Output device is set to %d", id),
+			},
+		}
 	}
 	return toolResult, nil
 }

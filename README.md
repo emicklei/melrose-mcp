@@ -11,6 +11,13 @@ To produce music, you need to setup a MIDI receiver such as a DAW or a hardware 
 
     go install github.com/emicklei/melrose-mcp@latest
 
+## tools
+
+- melrose_play
+- melrose_bpm
+- melrose_devices
+- melrose_change_output_device
+
 ## session
 
 >   change the tempo in melrose to a lower value
