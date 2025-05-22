@@ -19,6 +19,9 @@ var BuildTag = "dev"
 //go:embed resources/melrose_note_syntax.txt
 var noteSyntaxContent string
 
+//go:embed resources/melrose_llm_context.txt
+var playLLMContext string
+
 func main() {
 	notify.SetANSIColorsEnabled(false) // error messages cannot be colored
 
@@ -35,13 +38,25 @@ func main() {
 	playServer := mcpserver.NewMCPServer(ctx)
 
 	// Add resource for syntax
-	syntax := mcp.NewResource("file://melrose/note/syntax", "melrose note syntax", mcp.WithMIMEType("text/plain"))
+	// syntax := mcp.NewResource("file://melrose/note/syntax", "melrose note syntax", mcp.WithMIMEType("text/plain"))
+	// ioServer.AddResource(syntax, func(ctx context.Context, request mcp.ReadResourceRequest) ([]mcp.ResourceContents, error) {
+	// 	return []mcp.ResourceContents{
+	// 		mcp.TextResourceContents{
+	// 			URI:      "file://melrose/note/syntax",
+	// 			MIMEType: "text/plain",
+	// 			Text:     noteSyntaxContent,
+	// 		},
+	// 	}, nil
+	// })
+
+	// Add resource for context
+	syntax := mcp.NewResource("docs://melrose_play", "melrose expressions llm system context", mcp.WithMIMEType("text/plain"))
 	ioServer.AddResource(syntax, func(ctx context.Context, request mcp.ReadResourceRequest) ([]mcp.ResourceContents, error) {
 		return []mcp.ResourceContents{
 			mcp.TextResourceContents{
-				URI:      "file://melrose/note/syntax",
+				URI:      "docs://melrose_play",
 				MIMEType: "text/plain",
-				Text:     noteSyntaxContent,
+				Text:     playLLMContext,
 			},
 		}, nil
 	})
@@ -49,11 +64,11 @@ func main() {
 	// Add play tool
 	tool1 := mcp.NewTool("melrose_play",
 		mcp.WithDescription(`Melrōse is a language to create music by programming expressions.
-		 The language uses musical primitives (note, sequence, chord) and many functions (map, group, transpose)
-		 that can be used to create more complex patterns and loops of notes.`),
+		 The language uses musical primitives (note, sequence, chord) and many functions (map, group, transpose).
+		 See docs://melrose_play for more information.`),
 		mcp.WithString("expression",
 			mcp.Required(),
-			mcp.Description("functional expression using the syntax rules of https://xn--melrse-egb.org/docs/reference/notations"),
+			mcp.Description("functional expression using the syntax rules docs://melrose_play"),
 		),
 	)
 	ioServer.AddTool(tool1, playServer.HandlePlay)
