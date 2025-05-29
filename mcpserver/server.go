@@ -23,20 +23,12 @@ func NewMCPServer(ctx core.Context) *MCPServer {
 }
 
 func (s *MCPServer) HandleChangeOutputDevice(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	id, err := toInt(request.Params.Arguments["id"])
-	if err != nil {
-		return nil, err
+	id := request.GetInt("id", 0)
+	channel := request.GetInt("channel", 1)
+	if id < 1 || id > 16 {
+		return nil, fmt.Errorf("id must be a number between 1 and 16")
 	}
-	channel := 1
-	channelInput := request.Params.Arguments["channel"]
-	if channelInput != nil {
-		ci, err := toInt(channelInput)
-		if err != nil {
-			return nil, fmt.Errorf("channel must be a number between 1 and 16")
-		}
-		channel = ci
-	}
-	err = s.service.ChangeDefaultDeviceAndChannel(false, id, channel)
+	err := s.service.ChangeDefaultDeviceAndChannel(false, id, channel)
 	toolResult := new(mcp.CallToolResult)
 	if err != nil {
 		toolResult.IsError = true
@@ -58,10 +50,7 @@ func (s *MCPServer) HandleChangeOutputDevice(ctx context.Context, request mcp.Ca
 }
 
 func (s *MCPServer) HandleBPM(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	bpm, err := toFloat64(request.Params.Arguments["bpm"])
-	if err != nil {
-		return nil, err
-	}
+	bpm := request.GetFloat("bpm", 120)
 	if bpm < 1 || bpm > 300 {
 		return nil, errors.New("parameter must be positive number between 1 and 300")
 	}
@@ -77,10 +66,7 @@ func (s *MCPServer) HandleBPM(ctx context.Context, request mcp.CallToolRequest) 
 }
 
 func (s *MCPServer) HandlePlay(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	expression, ok := request.Params.Arguments["expression"].(string)
-	if !ok {
-		return nil, errors.New("expression must be a string")
-	}
+	expression := request.GetString("expression", "")
 	toolResult := new(mcp.CallToolResult)
 
 	// do not write to stdout as the MCP server is using that
