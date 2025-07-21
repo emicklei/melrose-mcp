@@ -8,8 +8,8 @@ import (
 	"github.com/emicklei/melrose-mcp/mcpserver"
 	"github.com/emicklei/melrose/notify"
 	"github.com/emicklei/melrose/system"
-	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 
 	_ "embed"
 )
@@ -31,35 +31,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	ioServer := server.NewMCPServer(
-		"melrose",
-		"v0.56.0",
-	)
+	ioServer := mcp.NewServer(&mcp.Implementation{Name: "melrose", Version: "v0.56.0"}, nil)
 	playServer := mcpserver.NewMCPServer(ctx)
 
-	// Add resource for syntax
-	// syntax := mcp.NewResource("file://melrose/note/syntax", "melrose note syntax", mcp.WithMIMEType("text/plain"))
-	// ioServer.AddResource(syntax, func(ctx context.Context, request mcp.ReadResourceRequest) ([]mcp.ResourceContents, error) {
-	// 	return []mcp.ResourceContents{
-	// 		mcp.TextResourceContents{
-	// 			URI:      "file://melrose/note/syntax",
-	// 			MIMEType: "text/plain",
-	// 			Text:     noteSyntaxContent,
-	// 		},
-	// 	}, nil
-	// })
-
 	// Add resource for context
-	syntax := mcp.NewResource("docs://melrose_play", "melrose expressions llm system context", mcp.WithMIMEType("text/plain"))
-	ioServer.AddResource(syntax, func(ctx context.Context, request mcp.ReadResourceRequest) ([]mcp.ResourceContents, error) {
-		return []mcp.ResourceContents{
-			mcp.TextResourceContents{
-				URI:      "docs://melrose_play",
-				MIMEType: "text/plain",
-				Text:     playLLMContext,
-			},
-		}, nil
-	})
+	ioServer.AddResource(&mcp.Resource{
+		Name:     "melrose expressions llm system context",
+		URI:      "docs://melrose_play",
+		MIMEType: "text/plain"},
+		func(context.Context, *mcp.ServerSession, *mcp.ReadResourceParams) (*mcp.ReadResourceResult, error) {
+			return &mcp.ReadResourceResult{
+				Contents: []*mcp.ResourceContents{
+					{
+						URI:      "docs://melrose_play",
+						MIMEType: "text/plain",
+						Text:     playLLMContext},
+				},
+			}, nil
+		})
 
 	// Add play tool
 	tool1 := mcp.NewTool("melrose_play",

@@ -12,6 +12,7 @@ require (
 	github.com/emicklei/tre v1.7.0 // indirect
 	github.com/expr-lang/expr v1.17.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/modelcontextprotocol/go-sdk v0.2.0 // indirect
 	github.com/spf13/cast v1.8.0 // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
 	gitlab.com/gomidi/midi/v2 v2.3.14 // indirect
