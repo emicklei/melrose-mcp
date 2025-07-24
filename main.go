@@ -9,6 +9,7 @@ import (
 	"github.com/emicklei/melrose/notify"
 	"github.com/emicklei/melrose/system"
 	"github.com/mark3labs/mcp-go/server"
+	"github.com/modelcontextprotocol/go-sdk/jsonschema"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
 	_ "embed"
@@ -50,7 +51,7 @@ func main() {
 			}, nil
 		})
 
-	// Add play tool
+	/** Add play tool
 	tool1 := mcp.NewTool("melrose_play",
 		mcp.WithDescription(`Melrōse is a language to create music by programming expressions.
 		 The language uses musical primitives (note, sequence, chord) and many functions (map, group, transpose).
@@ -61,7 +62,16 @@ func main() {
 		),
 	)
 	ioServer.AddTool(tool1, playServer.HandlePlay)
-
+	**/
+	ioServer.AddTool(&mcp.Tool{
+		Name: "melrose_play",
+		Description: `Melrōse is a language to create music by programming expressions.
+		 The language uses musical primitives (note, sequence, chord) and many functions (map, group, transpose).
+		 See docs://melrose_play for more information.`,
+		InputSchema: &jsonschema.Schema{}}, 
+		playServer.HandlePlay)
+	}
+/**
 	// Add bpm tool
 	tool2 := mcp.NewTool("melrose_bpm",
 		mcp.WithDescription(`Changes the beats per minutes setting. Default is 120.`),
@@ -114,7 +124,7 @@ func main() {
 	}
 	ioServer.AddPrompt(mcp.NewPrompt("play-chord",
 		mcp.WithPromptDescription("play the notes of a chord")), chordHander)
-
+**/
 	// Start the stdio server
 	if err := server.ServeStdio(ioServer); err != nil {
 		fmt.Printf("Server error: %v\n", err)
