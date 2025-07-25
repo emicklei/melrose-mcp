@@ -65,10 +65,11 @@ func main() {
 	**/
 	ioServer.AddTool(&mcp.Tool{
 		Name: "melrose_play",
+		Title: "melrose_play",
 		Description: `Melrōse is a language to create music by programming expressions.
 		 The language uses musical primitives (note, sequence, chord) and many functions (map, group, transpose).
 		 See docs://melrose_play for more information.`,
-		InputSchema: &jsonschema.Schema{}}, 
+		}, 
 		playServer.HandlePlay)
 	}
 /**

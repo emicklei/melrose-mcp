@@ -11,7 +11,7 @@ import (
 	"github.com/emicklei/melrose/api"
 	"github.com/emicklei/melrose/core"
 	"github.com/emicklei/melrose/notify"
-	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
 type MCPServer struct {
@@ -22,9 +22,14 @@ func NewMCPServer(ctx core.Context) *MCPServer {
 	return &MCPServer{service: api.NewService(ctx)}
 }
 
-func (s *MCPServer) HandleChangeOutputDevice(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	id := request.GetInt("id", 0)
-	channel := request.GetInt("channel", 1)
+type ChangeOutputDeviceParams struct {
+	ID      int `json:"id" jsonschema:"the output device id"`
+	Channel int `json:"channel" jsonschema:"the output channel, between 1 and 16"`
+}
+
+func (s *MCPServer) HandleChangeOutputDevice(ctx context.Context, cc *mcp.ServerSession, params *mcp.CallToolParamsFor[ChangeOutputDeviceParams]) (*mcp.CallToolResultFor[any], error) {
+	id := params.Arguments.ID
+	channel := params.Arguments.Channel
 	if id < 1 || id > 16 {
 		return nil, fmt.Errorf("id must be a number between 1 and 16")
 	}
@@ -33,15 +38,13 @@ func (s *MCPServer) HandleChangeOutputDevice(ctx context.Context, request mcp.Ca
 	if err != nil {
 		toolResult.IsError = true
 		toolResult.Content = []mcp.Content{
-			mcp.TextContent{
-				Type: "text",
+			&mcp.TextContent{
 				Text: err.Error(),
 			},
 		}
 	} else {
 		toolResult.Content = []mcp.Content{
-			mcp.TextContent{
-				Type: "text",
+			&mcp.TextContent{
 				Text: fmt.Sprintf("Output device is set to %d", id),
 			},
 		}
@@ -49,7 +52,7 @@ func (s *MCPServer) HandleChangeOutputDevice(ctx context.Context, request mcp.Ca
 	return toolResult, nil
 }
 
-func (s *MCPServer) HandleBPM(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (s *MCPServer) HandleBPM(ctx context.Context, cc *mcp.ServerSession, params *mcp.CallToolParamsFor[PlayParams]) (*mcp.CallToolResultFor[any], error) {
 	bpm := request.GetFloat("bpm", 120)
 	if bpm < 1 || bpm > 300 {
 		return nil, errors.New("parameter must be positive number between 1 and 300")
@@ -57,17 +60,20 @@ func (s *MCPServer) HandleBPM(ctx context.Context, request mcp.CallToolRequest) 
 	s.service.Context().Control().SetBPM(float64(bpm))
 	toolResult := new(mcp.CallToolResult)
 	toolResult.Content = []mcp.Content{
-		mcp.TextContent{
-			Type: "text",
+		&mcp.TextContent{
 			Text: fmt.Sprintf("BPM set to %f", bpm),
 		},
 	}
 	return toolResult, nil
 }
 
-func (s *MCPServer) HandlePlay(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	expression := request.GetString("expression", "")
-	toolResult := new(mcp.CallToolResult)
+type PlayParams struct {
+	Expression string `json:"expression"  jsonschema:"the melrose expression to play"`
+}
+
+func (s *MCPServer) HandlePlay(ctx context.Context, cc *mcp.ServerSession, params *mcp.CallToolParamsFor[PlayParams]) (*mcp.CallToolResultFor[any], error) {
+	expression := params.Arguments.Expression
+	toolResult := new(mcp.CallToolResultFor[any])
 
 	// do not write to stdout as the MCP server is using that
 	captured := new(bytes.Buffer)
@@ -78,12 +84,10 @@ func (s *MCPServer) HandlePlay(ctx context.Context, request mcp.CallToolRequest)
 		fmt.Fprintf(os.Stderr, "play failed: %v\n", err)
 		toolResult.IsError = true
 		toolResult.Content = []mcp.Content{
-			mcp.TextContent{
-				Type: "text",
+			&mcp.TextContent{
 				Text: expression,
 			},
-			mcp.TextContent{
-				Type: "text",
+			&mcp.TextContent{
 				Text: err.Error(),
 			}}
 		return toolResult, err
@@ -94,21 +98,18 @@ func (s *MCPServer) HandlePlay(ctx context.Context, request mcp.CallToolRequest)
 		time.Sleep(min(2*time.Minute, dur))
 	}
 	content := []mcp.Content{
-		mcp.TextContent{
-			Type: "text",
+		&mcp.TextContent{
 			Text: dur.String(),
 		}}
 	if p, ok := response.ExpressionResult.(core.Sequenceable); ok {
 		ps := p.S()
 		if len(ps.Notes) > 0 {
-			content = append(content, mcp.TextContent{
-				Type: "text",
+			content = append(content, &mcp.TextContent{
 				Text: ps.Storex(),
 			})
 		}
 	} else {
-		content = append(content, mcp.TextContent{
-			Type: "text",
+		content = append(content, &mcp.TextContent{
 			Text: fmt.Sprintf("%v", response.ExpressionResult),
 		})
 	}
@@ -116,7 +117,7 @@ func (s *MCPServer) HandlePlay(ctx context.Context, request mcp.CallToolRequest)
 	return toolResult, nil
 }
 
-func (s *MCPServer) HandleListDevices(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (s *MCPServer) HandleListDevices(ctx context.Context, cc *mcp.ServerSession, params *mcp.CallToolParamsFor[PlayParams]) (*mcp.CallToolResultFor[any], error) {
 	list := s.service.ListDevices()
 	toolResult := new(mcp.CallToolResult)
 	for _, d := range list {
@@ -124,8 +125,7 @@ func (s *MCPServer) HandleListDevices(ctx context.Context, request mcp.CallToolR
 		if !d.IsInput {
 			kind = "output"
 		}
-		toolResult.Content = append(toolResult.Content, mcp.TextContent{
-			Type: "text",
+		toolResult.Content = append(toolResult.Content, &mcp.TextContent{
 			Text: fmt.Sprintf("%s is available as %s with device id %d", d.Name, kind, d.ID),
 		})
 	}
