@@ -52,8 +52,19 @@ func (s *MCPServer) HandleChangeOutputDevice(ctx context.Context, cc *mcp.Server
 	return toolResult, nil
 }
 
-func (s *MCPServer) HandleBPM(ctx context.Context, cc *mcp.ServerSession, params *mcp.CallToolParamsFor[PlayParams]) (*mcp.CallToolResultFor[any], error) {
-	bpm := request.GetFloat("bpm", 120)
+type BPMParams struct {
+	BPM float64 `json:"bpm" jsonschema:"the beats per minute to set"`
+}
+
+func (p BPMParams) Get() float64 {
+	if p.BPM <= 0 {
+		return 120 // default
+	}
+	return p.BPM
+}
+
+func (s *MCPServer) HandleBPM(ctx context.Context, cc *mcp.ServerSession, params *mcp.CallToolParamsFor[BPMParams]) (*mcp.CallToolResultFor[any], error) {
+	bpm := params.Arguments.Get()
 	if bpm < 1 || bpm > 300 {
 		return nil, errors.New("parameter must be positive number between 1 and 300")
 	}
@@ -117,7 +128,9 @@ func (s *MCPServer) HandlePlay(ctx context.Context, cc *mcp.ServerSession, param
 	return toolResult, nil
 }
 
-func (s *MCPServer) HandleListDevices(ctx context.Context, cc *mcp.ServerSession, params *mcp.CallToolParamsFor[PlayParams]) (*mcp.CallToolResultFor[any], error) {
+type ListDevicesParams struct{}
+
+func (s *MCPServer) HandleListDevices(ctx context.Context, cc *mcp.ServerSession, params *mcp.CallToolParamsFor[ListDevicesParams]) (*mcp.CallToolResultFor[any], error) {
 	list := s.service.ListDevices()
 	toolResult := new(mcp.CallToolResult)
 	for _, d := range list {

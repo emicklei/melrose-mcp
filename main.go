@@ -2,14 +2,12 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"os"
 
 	"github.com/emicklei/melrose-mcp/mcpserver"
 	"github.com/emicklei/melrose/notify"
 	"github.com/emicklei/melrose/system"
-	"github.com/mark3labs/mcp-go/server"
-	"github.com/modelcontextprotocol/go-sdk/jsonschema"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
 	_ "embed"
@@ -63,71 +61,93 @@ func main() {
 	)
 	ioServer.AddTool(tool1, playServer.HandlePlay)
 	**/
-	ioServer.AddTool(&mcp.Tool{
-		Name: "melrose_play",
+	mcp.AddTool(ioServer, &mcp.Tool{
+		Name:  "melrose_play",
 		Title: "melrose_play",
 		Description: `Melrōse is a language to create music by programming expressions.
 		 The language uses musical primitives (note, sequence, chord) and many functions (map, group, transpose).
 		 See docs://melrose_play for more information.`,
-		}, 
-		playServer.HandlePlay)
-	}
-/**
-	// Add bpm tool
-	tool2 := mcp.NewTool("melrose_bpm",
-		mcp.WithDescription(`Changes the beats per minutes setting. Default is 120.`),
-		mcp.WithString("bpm",
-			mcp.Required(),
-			mcp.Description("number representing beats per minute, must be between 1 and 300"),
-		),
-	)
-	ioServer.AddTool(tool2, playServer.HandleBPM)
+	}, playServer.HandlePlay)
 
+	/**
+		// Add bpm tool
+		tool2 := mcp.NewTool("melrose_bpm",
+			mcp.WithDescription(`Changes the beats per minutes setting. Default is 120.`),
+			mcp.WithString("bpm",
+				mcp.Required(),
+				mcp.Description("number representing beats per minute, must be between 1 and 300"),
+			),
+		)
+	**/
+	mcp.AddTool(ioServer, &mcp.Tool{
+		Name:        "melrose_bpm",
+		Title:       "melrose_bpm",
+		Description: `Changes the beats per minutes setting. Default is 120.`,
+	}, playServer.HandleBPM)
+
+	/**
 	// Add device listing
 	tool3 := mcp.NewTool("melrose_devices",
 		mcp.WithDescription(`List all available input and output MIDI devices.`),
 	)
 	ioServer.AddTool(tool3, playServer.HandleListDevices)
+	**/
 
-	// Add device selector
-	tool4 := mcp.NewTool("melrose_change_output_device",
-		mcp.WithDescription(`Change the output device to the one specified by the device name.`),
-		mcp.WithNumber("id",
-			mcp.Required(),
-			mcp.Description("id me of the output device")),
-		mcp.WithNumber("channel",
-			mcp.Description("default channel number for this device. Must be between 1 and 16")))
-	ioServer.AddTool(tool4, playServer.HandleChangeOutputDevice)
+	mcp.AddTool(ioServer, &mcp.Tool{
+		Name:        "melrose_devices",
+		Title:       "melrose_devices",
+		Description: `List all available input and output MIDI devices.`,
+	}, playServer.HandleChangeOutputDevice)
 
-	// Add chord prompt
-	chordHander := func(ctx context.Context, request mcp.GetPromptRequest) (*mcp.GetPromptResult, error) {
-		note := request.Params.Arguments["ground"]
-		if note == "" {
-			note = "C"
+	/**
+		// Add device selector
+		tool4 := mcp.NewTool("melrose_change_output_device",
+			mcp.WithDescription(`Change the output device to the one specified by the device name.`),
+			mcp.WithNumber("id",
+				mcp.Required(),
+				mcp.Description("id me of the output device")),
+			mcp.WithNumber("channel",
+				mcp.Description("default channel number for this device. Must be between 1 and 16")))
+		ioServer.AddTool(tool4, playServer.HandleChangeOutputDevice)
+	**/
+
+	mcp.AddTool(ioServer, &mcp.Tool{
+		Name:        "melrose_change_output_device",
+		Title:       "melrose_change_output_device",
+		Description: `Change the output device to the one specified by the device name.`,
+	}, playServer.HandleChangeOutputDevice)
+
+	/**
+		// Add chord prompt
+		chordHander := func(ctx context.Context, request mcp.GetPromptRequest) (*mcp.GetPromptResult, error) {
+			note := request.Params.Arguments["ground"]
+			if note == "" {
+				note = "C"
+			}
+			fraction := request.Params.Arguments["fraction"]
+			if fraction == "" {
+				fraction = "4"
+			}
+			octave := request.Params.Arguments["octave"]
+			if octave == "" {
+				octave = "4"
+			}
+			return mcp.NewGetPromptResult(
+				"playing a chord",
+				[]mcp.PromptMessage{
+					mcp.NewPromptMessage(
+						mcp.RoleAssistant,
+						mcp.NewTextContent(fmt.Sprintf("chord('%s%s%s')", fraction, note, octave)),
+					),
+				},
+			), nil
 		}
-		fraction := request.Params.Arguments["fraction"]
-		if fraction == "" {
-			fraction = "4"
-		}
-		octave := request.Params.Arguments["octave"]
-		if octave == "" {
-			octave = "4"
-		}
-		return mcp.NewGetPromptResult(
-			"playing a chord",
-			[]mcp.PromptMessage{
-				mcp.NewPromptMessage(
-					mcp.RoleAssistant,
-					mcp.NewTextContent(fmt.Sprintf("chord('%s%s%s')", fraction, note, octave)),
-				),
-			},
-		), nil
-	}
-	ioServer.AddPrompt(mcp.NewPrompt("play-chord",
-		mcp.WithPromptDescription("play the notes of a chord")), chordHander)
-**/
+		ioServer.AddPrompt(mcp.NewPrompt("play-chord",
+			mcp.WithPromptDescription("play the notes of a chord")), chordHander)
+	**/
 	// Start the stdio server
-	if err := server.ServeStdio(ioServer); err != nil {
-		fmt.Printf("Server error: %v\n", err)
+	t := mcp.NewLoggingTransport(mcp.NewStdioTransport(), os.Stderr)
+	if err := ioServer.Run(context.Background(), t); err != nil {
+		log.Printf("Server failed: %v", err)
 	}
 }
