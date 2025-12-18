@@ -50,8 +50,8 @@ Notes are separated by a single space.
 
 #### Groups (Chords)
 Notes played simultaneously are enclosed in parentheses `()`.
-- `(C E G)` → C Major chord (Quarter lengths).
-- `(1C 1E 1G)` → Whole note chord.
+- `(C C5)` → Two C notes with different octaves (Quarter lengths).
+- `(1C 1E 1G)` → Whole note chord C major.
 
 ### 4. COMPREHENSIVE EXAMPLES
 
