@@ -4,6 +4,10 @@
 
 `melrose-mcp` is an [MCP](http://modelcontextprotocol.io/) server (STDIO) that uses the packages from the `melrōse` tool.
 
+## Hosted deployment
+
+A hosted deployment is available on [Fronteir AI](https://fronteir.ai/mcp/emicklei-melrose-mcp).
+
 ## installation
 
 This mcp server requires the [Go SDK](https://go.dev) for installation.
