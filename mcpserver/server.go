@@ -27,11 +27,11 @@ type ChangeOutputDeviceParams struct {
 	Channel int `json:"channel" jsonschema:"the output channel, between 1 and 16"`
 }
 
-func (s *MCPServer) HandleChangeOutputDevice(ctx context.Context, cc *mcp.ServerSession, params *mcp.CallToolParamsFor[ChangeOutputDeviceParams]) (*mcp.CallToolResultFor[any], error) {
-	id := params.Arguments.ID
-	channel := params.Arguments.Channel
+func (s *MCPServer) HandleChangeOutputDevice(ctx context.Context, request *mcp.CallToolRequest, params ChangeOutputDeviceParams) (*mcp.CallToolResult, any, error) {
+	id := params.ID
+	channel := params.Channel
 	if id < 1 || id > 16 {
-		return nil, fmt.Errorf("id must be a number between 1 and 16")
+		return nil, nil, fmt.Errorf("id must be a number between 1 and 16")
 	}
 	err := s.service.ChangeDefaultDeviceAndChannel(false, id, channel)
 	toolResult := new(mcp.CallToolResult)
@@ -49,7 +49,7 @@ func (s *MCPServer) HandleChangeOutputDevice(ctx context.Context, cc *mcp.Server
 			},
 		}
 	}
-	return toolResult, nil
+	return toolResult, nil, nil
 }
 
 type BPMParams struct {
@@ -63,10 +63,10 @@ func (p BPMParams) Get() float64 {
 	return p.BPM
 }
 
-func (s *MCPServer) HandleBPM(ctx context.Context, cc *mcp.ServerSession, params *mcp.CallToolParamsFor[BPMParams]) (*mcp.CallToolResultFor[any], error) {
-	bpm := params.Arguments.Get()
+func (s *MCPServer) HandleBPM(ctx context.Context, request *mcp.CallToolRequest, params BPMParams) (*mcp.CallToolResult, any, error) {
+	bpm := params.Get()
 	if bpm < 1 || bpm > 300 {
-		return nil, errors.New("parameter must be positive number between 1 and 300")
+		return nil, nil, errors.New("parameter must be positive number between 1 and 300")
 	}
 	s.service.Context().Control().SetBPM(float64(bpm))
 	toolResult := new(mcp.CallToolResult)
@@ -75,16 +75,16 @@ func (s *MCPServer) HandleBPM(ctx context.Context, cc *mcp.ServerSession, params
 			Text: fmt.Sprintf("BPM set to %f", bpm),
 		},
 	}
-	return toolResult, nil
+	return toolResult, nil, nil
 }
 
 type PlayParams struct {
 	Expression string `json:"expression"  jsonschema:"the melrose expression to play"`
 }
 
-func (s *MCPServer) HandlePlay(ctx context.Context, cc *mcp.ServerSession, params *mcp.CallToolParamsFor[PlayParams]) (*mcp.CallToolResultFor[any], error) {
-	expression := params.Arguments.Expression
-	toolResult := new(mcp.CallToolResultFor[any])
+func (s *MCPServer) HandlePlay(ctx context.Context, request *mcp.CallToolRequest, params PlayParams) (*mcp.CallToolResult, any, error) {
+	expression := params.Expression
+	toolResult := new(mcp.CallToolResult)
 
 	// do not write to stdout as the MCP server is using that
 	captured := new(bytes.Buffer)
@@ -101,7 +101,7 @@ func (s *MCPServer) HandlePlay(ctx context.Context, cc *mcp.ServerSession, param
 			&mcp.TextContent{
 				Text: err.Error(),
 			}}
-		return toolResult, err
+		return toolResult, nil, err
 	}
 	dur := max(time.Until(response.EndTime), 0) // not negative
 	// wait until music has stopped playing or it is taking too long (2 min)
@@ -125,12 +125,12 @@ func (s *MCPServer) HandlePlay(ctx context.Context, cc *mcp.ServerSession, param
 		})
 	}
 	toolResult.Content = content
-	return toolResult, nil
+	return toolResult, nil, nil
 }
 
 type ListDevicesParams struct{}
 
-func (s *MCPServer) HandleListDevices(ctx context.Context, cc *mcp.ServerSession, params *mcp.CallToolParamsFor[ListDevicesParams]) (*mcp.CallToolResultFor[any], error) {
+func (s *MCPServer) HandleListDevices(ctx context.Context, request *mcp.CallToolRequest, params ListDevicesParams) (*mcp.CallToolResult, any, error) {
 	list := s.service.ListDevices()
 	toolResult := new(mcp.CallToolResult)
 	for _, d := range list {
@@ -142,5 +142,5 @@ func (s *MCPServer) HandleListDevices(ctx context.Context, cc *mcp.ServerSession
 			Text: fmt.Sprintf("%s is available as %s with device id %d", d.Name, kind, d.ID),
 		})
 	}
-	return toolResult, nil
+	return toolResult, nil, nil
 }

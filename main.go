@@ -38,7 +38,7 @@ func main() {
 		Name:     "melrose expressions llm system context",
 		URI:      "docs://melrose_play",
 		MIMEType: "text/plain"},
-		func(context.Context, *mcp.ServerSession, *mcp.ReadResourceParams) (*mcp.ReadResourceResult, error) {
+		func(context.Context, *mcp.ReadResourceRequest) (*mcp.ReadResourceResult, error) {
 			return &mcp.ReadResourceResult{
 				Contents: []*mcp.ResourceContents{
 					{
@@ -97,7 +97,7 @@ func main() {
 		Name:        "melrose_devices",
 		Title:       "melrose_devices",
 		Description: `List all available input and output MIDI devices.`,
-	}, playServer.HandleChangeOutputDevice)
+	}, playServer.HandleListDevices)
 
 	/**
 		// Add device selector
@@ -146,7 +146,7 @@ func main() {
 			mcp.WithPromptDescription("play the notes of a chord")), chordHander)
 	**/
 	// Start the stdio server
-	t := mcp.NewLoggingTransport(mcp.NewStdioTransport(), os.Stderr)
+	t := &mcp.StdioTransport{}
 	if err := ioServer.Run(context.Background(), t); err != nil {
 		log.Printf("Server failed: %v", err)
 	}
