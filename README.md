@@ -1,4 +1,5 @@
 ## melrose-mcp 
+[![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/emicklei/melrose-mcp)](https://archestra.ai/mcp-catalog/emicklei__melrose-mcp)
 
 [melrōse](https://melrōse.org) is a tool to create and play music by programming melodies. It uses a custom language to compose notes and create loops and tracks to play.
 
